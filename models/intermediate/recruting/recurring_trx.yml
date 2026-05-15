@@ -1,0 +1,40 @@
+version: 2
+
+models:
+  - name: int_recurring_transactions
+    description: >
+      Identifies recurring subscription, utility, and payroll patterns. 
+      Clusters transaction values by rounding out minor cent variations 
+      and measures the time cadence between consecutive events.
+    columns:
+      - name: account_origin_id
+        description: "The account initiating the recurring payments."
+        tests:
+          - not_null
+
+      - name: account_destination_id
+        description: "The receiving merchant or account entity."
+        tests:
+          - not_null
+
+      - name: rounded_amount
+        description: "The base transaction amount rounded to the nearest whole integer to strip cent-level noise."
+        tests:
+          - not_null
+
+      - name: total_occurrences
+        description: "The total number of transactions matched within this specific rounded value and recipient group."
+        tests:
+          - not_null
+
+      - name: clean_avg_amount
+        description: "The true exact mean of the transaction values before rounding was applied."
+        tests:
+          - not_null
+
+      - name: recurring_cadence
+        description: "The classified schedule based on the mathematical frequency and repeat counts."
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['monthly_recurring', 'weekly_recurring', 'irregular_pattern']

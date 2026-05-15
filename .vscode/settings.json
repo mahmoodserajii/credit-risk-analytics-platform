@@ -1,0 +1,17 @@
+{
+  "sqltools.connections": [
+    {
+      "ssh": "Disabled",
+      "previewLimit": 50,
+      "server": "localhost",
+      "port": 5432,
+      "driver": "PostgreSQL",
+      "name": "postgres",
+      "database": "credit_risk_analytics",
+      "username": "postgres",
+      "password": "1234"
+    }
+  ],
+  "dbt.dbtPythonPathOverride": "E:\\project\\credit-risk-analytics\\credit\\Scripts\\python.exe",
+  "dbt.perspectiveTheme": "Vintage"
+}

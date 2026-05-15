@@ -1,0 +1,50 @@
+version: 2
+
+models:
+  - name: mart_monthly_risk_trends
+    description: >
+      Macro-level reporting mart blending chronological customer credit summaries with 
+      historical commercial loan origination trends to isolate institutional risk vectors over time.
+    columns:
+      - name: report_month
+        description: "Primary key. Unified date axis representing the calendar month of tracking (Format: YYYY-MM-01)."
+        tests:
+          - not_null
+          - unique
+
+      - name: active_customers
+        description: "The count of unique, distinct customers executing transaction activity during the month."
+        tests:
+          - not_null
+
+      - name: median_customer_risk_score
+        description: "The historical midpoint risk score computed via ordered-set percentiles to eliminate outlier skew."
+
+      - name: high_risk_customers
+        description: "Total count of active customer profiles falling strictly into the high_risk security tier."
+        tests:
+          - not_null
+
+      - name: high_risk_ratio_pct
+        description: "Percentage ratio of active high-risk customers against total month-specific activity (0.00 to 100.00)."
+        tests:
+          - not_null
+
+      - name: total_loan_volume
+        description: "The aggregate deployed principal loan volume initialized during the specific report month."
+        tests:
+          - not_null
+
+      - name: avg_interest_rate
+        description: "The baseline mean interest rate for the month's loan cohort, scaled as a whole percentage."
+
+      - name: high_interest_loan_ratio
+        description: "Percentage ratio of high-interest credit lines deployed vs total monthly originations."
+
+      - name: portfolio_risk_segment
+        description: "Macro-level portfolio risk designation assigned to the month's lending bucket."
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['high_risk_period', 'medium_risk_period', 'low_risk_period', 'no_loans_period']

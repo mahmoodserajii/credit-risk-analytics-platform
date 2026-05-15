@@ -1,0 +1,30 @@
+name: 'credit_risk_project'
+version: '1.0.0'
+config-version: 2
+
+profile: 'credit_risk_project'
+
+# Directory paths
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["models/snapshots"]    
+
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+# Model specific configurations
+models:
+  credit_risk_project:
+    staging:
+      +schema: staging
+      +materialized: table
+    intermediate:
+      +schema: intermediate
+      +materialized: table
+    marts:
+      +schema: marts
+      +materialized: table

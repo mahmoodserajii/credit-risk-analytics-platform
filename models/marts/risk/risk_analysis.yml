@@ -1,0 +1,104 @@
+version: 2
+
+models:
+  - name: mart_credit_risk
+    description: >
+      Underwriting and credit risk reporting mart. Consolidated view of customer-level 
+      exposure, composite risk ratings, and financial cashflow volatility flags.
+    columns:
+      - name: customer_id
+        description: "Primary key. Unique customer tracking identifier."
+        tests:
+          - not_null
+          - unique
+
+      - name: customer_name
+        description: "Concatenated full name of the bank customer."
+        tests:
+          - not_null
+
+      - name: customer_value_segment
+        description: "Value tier classification based on demographic asset thresholds."
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['standard_customer', 'mid_value_customer', 'high_value_customer']
+
+      - name: composite_customer_risk_score
+        description: "The multi-weighted credit score bound strictly between 0 and 100."
+        tests:
+          - not_null
+
+      - name: customer_risk_segment
+        description: "Categorical risk assessment bucket used for underwriting gating."
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['low_risk', 'medium_risk', 'high_risk']
+
+      - name: stable_cashflow
+        description: "Boolean indicator. True if month-over-month volatility stays below the 50% relative ceiling."
+        tests:
+          - not_null
+
+  - name: mart_loan_portfolio
+    description: >
+      Master commercial loan book portfolio ledger. Tracks loan-level risk metrics, 
+      exposure segments, and anchors individual loan scales against macro monthly trend averages.
+    columns:
+      - name: loan_id
+        description: "Primary key. Unique identifier for the individual loan contract."
+        tests:
+          - not_null
+          - unique
+
+      - name: loan_status
+        description: "Human-readable status of the credit contract (e.g., Active, Defaulted, Fully Paid)."
+        tests:
+          - not_null
+
+      - name: loan_amount
+        description: "The total deployed principal capital amount."
+        tests:
+          - not_null
+
+      - name: interest_rate
+        description: "Raw contract interest rate stored as a decimal (e.g., 0.16 represents 16%)."
+        tests:
+          - not_null
+
+      - name: loan_risk_segment
+        description: "Individual loan safety classification bucket."
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['high_risk', 'medium_risk', 'low_risk']
+
+      - name: loan_size_segment
+        description: "Size cohort categorizing the principal value tier of the deployed capital."
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['small_loan', 'medium_loan', 'large_loan']
+
+      - name: high_interest_flag
+        description: "Boolean indicator. True if the interest rate multiplied by 100 exceeds 20%."
+        tests:
+          - not_null
+
+      - name: portfolio_risk_segment
+        description: "The macro monthly portfolio classification bucket that this loan originated under."
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['high_risk_period', 'medium_risk_period', 'low_risk_period']
+
+      - name: is_significantly_large_loan
+        description: "Boolean indicator. True if the loan amount is 1.5x greater than its monthly cohort average."
+        tests:
+          - not_null

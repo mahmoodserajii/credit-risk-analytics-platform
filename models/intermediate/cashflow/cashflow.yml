@@ -1,0 +1,26 @@
+version: 2
+
+models:
+  - name: int_cashflow_stability
+    description: "Customer cashflow stability and volatility metrics calculated at a monthly grain."
+    columns:
+
+      - name: customer_id
+        description: "Primary key. Unique identifier for the customer."
+        tests:
+          - not_null
+          - unique
+
+      - name: cashflow_volatility
+        description: "Standard deviation of the monthly net cashflow (received minus sent)."
+
+      - name: avg_monthly_cashflow
+        description: "The mean net cashflow across all months of activity."
+
+      - name: stable_cashflow
+        description: >
+          Boolean flag. True if the Coefficient of Variation (Volatility / Average) 
+          is less than 0.50 (50%). This indicates the monthly cashflow swings 
+          stay within 50% of the customer's typical average.
+        tests:
+          - not_null

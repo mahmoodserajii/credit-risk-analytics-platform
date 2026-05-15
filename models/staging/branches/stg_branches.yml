@@ -1,0 +1,21 @@
+version: 2
+
+models:
+  - name: stg_branches
+    description: "Bank branch reference data"
+
+    columns:
+      - name: branch_id
+        tests:
+          - unique
+          - not_null
+
+      - name: branch_name
+        tests:
+          - not_null
+
+      - name: address_id
+        tests:
+          - relationships:
+              to: ref('stg_addresses')
+              field: address_id

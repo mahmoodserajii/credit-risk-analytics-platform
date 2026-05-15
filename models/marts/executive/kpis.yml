@@ -1,0 +1,74 @@
+version: 2
+
+models:
+  - name: mart_executive_kpis
+    description: >
+      High-level business snapshot ledger designed for C-suite reporting. 
+      Consolidates bank-wide totals, portfolio liquidity reserves, cross-functional risk concentrations, 
+      and overall transaction volume into a single high-performance KPI record.
+    columns:
+      - name: snapshot_month
+        description: "The calendar month during which the KPI pass was compiled (Format: YYYY-MM-01)."
+        tests:
+          - not_null
+          - unique
+
+      - name: total_customers
+        description: "The total number of unique active and inactive customers registered in the system."
+        tests:
+          - not_null
+
+      - name: premium_growth_customers
+        description: "Total count of active premium clients mapped under the premium_growth matrix segment (High Value, Low Risk)."
+        tests:
+          - not_null
+
+      - name: high_value_high_risk_customers
+        description: "Total count of highly valuable clients carrying systemic credit or exposure risks."
+        tests:
+          - not_null
+
+      - name: early_warning_risk_customers
+        description: "Total count of standard mid-tier clients showing early-stage signs of risk degradation."
+        tests:
+          - not_null
+
+      - name: toxic_loss_customers
+        description: "Total count of low-value accounts flagged as high-risk, representing high collections overhead."
+        tests:
+          - not_null
+
+      - name: total_deposits
+        description: "The total aggregate financial reserves held by the bank across all client accounts."
+        tests:
+          - not_null
+
+      - name: net_system_flow
+        description: "The consolidated net transactional cash flow change across the entire banking infrastructure."
+        tests:
+          - not_null
+
+      - name: total_transactions
+        description: "Bank-wide cumulative count of all inbound and outbound transactions combined."
+        tests:
+          - not_null
+
+      - name: total_transaction_volume
+        description: "The total aggregate monetary volume processed through the network infrastructure."
+        tests:
+          - not_null
+
+      - name: customers_with_negative_balance
+        description: "Total number of distinct account owners carrying an active negative financial balance footprint."
+        tests:
+          - not_null
+
+      - name: avg_balance_per_customer
+        description: "The true mean deposit scale calculated bank-wide as total deposits divided by total customers."
+        tests:
+          - not_null
+
+      - name: high_value_risk_concentration_pct
+        description: "Percentage ratio of high-value, high-risk customers relative to the entire customer base (0.00 to 100.00)."
+        tests:
+          - not_null

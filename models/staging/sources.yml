@@ -1,0 +1,19 @@
+version: 2
+
+sources:
+  - name: raw
+    database: credit_risk_analytics
+    schema: public
+
+    tables:
+      - name: customers
+      - name: accounts
+      - name: loans
+      - name: transactions
+      - name: branches
+      - name: addresses
+      - name: customer_types
+      - name: account_types
+      - name: account_statuses
+      - name: loan_statuses
+      - name: transaction_types

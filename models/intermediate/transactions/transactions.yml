@@ -1,0 +1,151 @@
+version: 2
+
+models:
+  - name: int_transaction_behavior
+    description: "Account-level aggregations tracking daily historical transaction frequency, volume peaks, and usage density."
+    columns:
+      - name: account_id
+        description: "Primary key. Unique identifier for the evaluated bank account."
+        tests:
+          - not_null
+          - unique
+
+      - name: active_transaction_days
+        description: "Total number of distinct calendar days where this account executed at least one transaction."
+        tests:
+          - not_null
+
+      - name: avg_daily_transaction_count
+        description: "The historical mean number of transactions generated per active day."
+        tests:
+          - not_null
+
+      - name: max_daily_transaction_count
+        description: "The highest number of transactions executed in a single calendar day."
+        tests:
+          - not_null
+
+      - name: avg_daily_transaction_volume
+        description: "The historical mean monetary volume processed per active day."
+        tests:
+          - not_null
+
+      - name: max_daily_transaction_volume
+        description: "The highest aggregate monetary volume processed in a single calendar day."
+        tests:
+          - not_null
+
+      - name: avg_transaction_amount
+        description: "Nested average calculation reflecting the typical historical transaction amount."
+        tests:
+          - not_null
+
+      - name: is_high_volume_account
+        description: "Boolean flag. True if the account's historical average daily volume exceeds €3,000."
+        tests:
+          - not_null
+
+  - name: int_transaction_outliers
+    description: "Transaction-level anomaly detection evaluated against a localized 99th percentile historical baseline."
+    columns:
+      - name: transaction_id
+        description: "Primary key for the transaction entity."
+        tests:
+          - not_null
+          - unique
+
+      - name: account_origin_id
+        description: "Foreign key referencing the bank account initiating the funds transfer."
+        tests:
+          - not_null
+
+      - name: amount
+        description: "The exact raw monetary value processed."
+        tests:
+          - not_null
+
+      - name: account_99th_percentile
+        description: "The calculated 99th percentile ceiling computed natively via Postgres Ordered-Set Aggregates."
+        tests:
+          - not_null
+
+      - name: is_outlier
+        description: "Boolean flag. True if the individual transaction amount exceeds the account's historical 99th percentile threshold."
+        tests:
+          - not_null
+
+  - name: int_transaction_risk_features
+    description: "Transaction-level analytical features tracking deviations from historical standard deviations alongside an automated composite fraud score."
+    columns:
+      - name: transaction_id
+        description: "Primary key for the transaction entity."
+        tests:
+          - not_null
+          - unique
+
+      - name: account_origin_id
+        description: "Foreign key for the account initiating the transfer."
+        tests:
+          - not_null
+
+      - name: amount
+        description: "Monetary size of the individual ledger item."
+        tests:
+          - not_null
+
+      - name: account_avg_amount
+        description: "The rolling baseline window average amount computed specifically for the origin account."
+        tests:
+          - not_null
+
+      - name: account_std_amount
+        description: "The statistical standard deviation computed specifically for the origin account."
+
+      - name: is_abnormally_large_transaction
+        description: "Boolean flag. True if the individual transaction value scales past 3 standard deviations above the account mean."
+        tests:
+          - not_null
+
+      - name: is_invalid_transaction_amount
+        description: "Boolean flag. True if the amount is zero or negative."
+        tests:
+          - not_null
+
+      - name: fraud_score
+        description: "Dynamic composite validation risk rating compiled via downstream system macros."
+        tests:
+          - not_null
+
+  - name: int_transaction_velocity
+    description: "Real-time transaction-level burst features tracking rolling 1-hour transaction frequencies and capital deployment speeds."
+    columns:
+      - name: transaction_id
+        description: "Primary key for the transaction record."
+        tests:
+          - not_null
+          - unique
+
+      - name: account_id
+        description: "The target origin bank account monitored for rapid velocity."
+        tests:
+          - not_null
+
+      - name: amount
+        description: "The raw financial value of the specific transaction."
+        tests:
+          - not_null
+
+      - name: txn_count_last_hour
+        description: "The historical transaction density calculated across an un-truncated, sliding 60-minute rolling window frame."
+        tests:
+          - not_null
+
+      - name: volume_last_hour
+        description: "The historical monetary density calculated across an un-truncated, sliding 60-minute rolling window frame."
+        tests:
+          - not_null
+
+      - name: high_velocity_flag
+        description: "Boolean flag. True if more than 20 distinct operations occurred within the rolling 60-minute target constraint window."
+        tests:
+          - not_null

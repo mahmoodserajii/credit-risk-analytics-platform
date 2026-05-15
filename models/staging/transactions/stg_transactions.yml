@@ -1,0 +1,56 @@
+version: 2
+
+models:
+  - name: stg_transactions
+    description: "Account-to-account transaction ledger with customer enrichment and data quality flags."
+
+    columns:
+      - name: transaction_id
+        tests:
+          - unique
+          - not_null
+
+      - name: account_origin_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_accounts')
+              field: account_id
+
+      - name: account_destination_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_accounts')
+              field: account_id
+
+      - name: customer_id
+        description: "Enriched from stg_accounts based on the AccountOriginID."
+        tests:
+          - not_null
+
+      - name: transaction_type_id
+        tests:
+          - relationships:
+              to: ref('stg_transaction_types')
+              field: transaction_type_id
+
+      - name: amount
+        tests:
+          - not_null
+
+      - name: branch_id
+        tests:
+          - relationships:
+              to: ref('stg_branches')
+              field: branch_id
+
+      - name: transaction_date
+        description: "The date of the transaction, cleaned via macro."
+
+      # Data Quality Flags
+      - name: is_future_transaction
+        description: "True if the date is invalid or in the future."
+
+      - name: is_negative_amount
+        description: "True if the transaction amount is less than zero."

@@ -1,0 +1,27 @@
+version: 2
+
+models:
+  - name: int_branch_performance
+    description: "Branch-level operational performance metrics based on transaction activity."
+    columns:
+
+      - name: branch_id
+        description: "Unique identifier for branch"
+        tests:
+          - not_null
+          - unique
+
+      - name: branch_name
+        description: "Name of the branch"
+
+      - name: total_transactions
+        description: "Total number of transactions handled by branch"
+
+      - name: total_transaction_volume
+        description: "Total monetary volume processed"
+
+      - name: branch_segment
+        description: "Branch classification based on volume"
+        tests:
+          - accepted_values:
+              values: ['low_volume_branch', 'medium_volume_branch', 'high_volume_branch']

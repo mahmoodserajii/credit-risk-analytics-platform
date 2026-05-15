@@ -1,0 +1,81 @@
+version: 2
+
+models:
+  - name: fct_customer_behavior_features
+    description: >
+      Customer-centric behavioural analytics feature store. Consolidates multi-dimensional 
+      lifecycle, velocity, stability, and growth segments into a single record per customer.
+    columns:
+      - name: customer_id
+        description: "Primary key. Unique identifier for the customer profile."
+        tests:
+          - not_null
+          - unique
+          - relationships:
+              to: ref('stg_customers')
+              field: customer_id
+
+      - name: customer_tenure_days
+        description: "Cumulative count of calendar days elapsed since the customer profile was first provisioned."
+        tests:
+          - not_null
+
+      - name: account_lifetime_count
+        description: "Total count of distinct checking, savings, or credit accounts opened by this specific customer."
+        tests:
+          - not_null
+
+      - name: total_transactions
+        description: "Aggregated transaction count calculated as the sum of all incoming and outgoing transaction events."
+        tests:
+          - not_null
+
+      - name: total_amount_sent
+        description: "Total cumulative monetary volume transferred out of this customer's accounts."
+        tests:
+          - not_null
+
+      - name: total_amount_received
+        description: "Total cumulative monetary volume transferred into this customer's accounts."
+        tests:
+          - not_null
+
+      - name: net_transaction_flow
+        description: "Net asset position delta computed as total amount received minus total amount sent."
+        tests:
+          - not_null
+
+      - name: cashflow_volatility
+        description: "The historical standard deviation of monthly net cashflow values. Returns null for single-month accounts."
+
+      - name: stable_cashflow
+        description: "Boolean indicator. True if the client's coefficient of variation falls safely below the 50% relative stability ceiling."
+        tests:
+          - not_null
+
+      - name: customer_segment
+        description: "Assigned value tier classification derived from gross inflows, net directional positions, and stability flags."
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['premium_stable', 'high_value', 'financially_risky', 'standard']
+
+      - name: tenure_segment
+        description: "Chronological classification bucket adjusted safely for decade-scale leap year drifts."
+        tests:
+          - not_null
+          - accepted_values:
+              values:
+                - new_customer
+                - mid_term_customer
+                - long_term_customer
+
+      - name: activity_segment
+        description: "Volumetric segmentation grading absolute transaction frequencies across combined account streams."
+        tests:
+          - not_null
+          - accepted_values:
+              values:
+                - low_activity
+                - medium_activity
+                - high_activity

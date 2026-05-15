@@ -1,0 +1,150 @@
+version: 2
+
+models:
+  - name: fct_customer_risk_features
+    description: >
+      Unified customer-level credit risk feature store. Combines financial exposure data,
+      fraud activity profiles, and cashflow stability metrics into a single, multi-weighted composite score.
+    columns:
+      - name: customer_id
+        description: "Primary key. Unique customer identifier."
+        tests:
+          - not_null
+          - unique
+          - relationships:
+              to: ref('stg_customers')
+              field: customer_id
+
+      - name: total_accounts
+        description: "Total number of accounts linked to the customer."
+        tests:
+          - not_null
+
+      - name: total_amount_sent
+        description: "Total volume of capital transferred out by the customer."
+        tests:
+          - not_null
+
+      - name: total_amount_received
+        description: "Total volume of capital received by the customer."
+        tests:
+          - not_null
+
+      - name: net_transaction_flow
+        description: "Net position directional flow (Inflow minus Outflow)."
+        tests:
+          - not_null
+
+      - name: customer_value_segment
+        description: "Value tier mapping pulled from core demographics profile."
+        tests:
+          - not_null
+
+      - name: total_balance_exposure
+        description: "Total aggregated balance exposure across all active accounts."
+        tests:
+          - not_null
+
+      - name: overdraft_exposure
+        description: "Total negative balance exposure from overdrawn checking or credit lines."
+        tests:
+          - not_null
+
+      - name: avg_account_balance
+        description: "Mean account balance calculated across all accounts owned by the customer."
+        tests:
+          - not_null
+
+      - name: cashflow_volatility
+        description: "The raw standard deviation of monthly net cashflows. Evaluates to null for single-month accounts."
+
+      - name: avg_monthly_cashflow
+        description: "The historical mean net cashflow across all active months (corrected from avg_cashflow)."
+        tests:
+          - not_null
+
+      - name: stable_cashflow
+        description: "Boolean indicator. True if relative volatility stays within the 50% target boundary."
+        tests:
+          - not_null
+
+      - name: total_flagged_transactions
+        description: "Cumulative count of suspicious operations flagged by intermediate systems."
+        tests:
+          - not_null
+
+      - name: high_risk_transaction_ratio
+        description: "Percentage ratio of high-risk transactions vs total history (0.00 to 1.00)."
+        tests:
+          - not_null
+
+      - name: avg_account_risk_score
+        description: "Average account-level baseline risk score calculated from stg_accounts linkages."
+        tests:
+          - not_null
+
+      - name: composite_customer_risk_score
+        description: "Combined risk score scaled safely between 0 and 100 via a capped volatility modifier."
+        tests:
+          - not_null
+
+      - name: customer_risk_segment
+        description: "Final categorical customer risk classification derived from the composite score."
+        tests:
+          - not_null
+          - accepted_values:
+              values:
+                - low_risk
+                - medium_risk
+                - high_risk
+
+  - name: fct_loan_risk_features
+    description: "Loan-level engineered credit risk features for active portfolio tracking."
+    columns:
+      - name: loan_id
+        description: "Primary key. Unique loan identifier."
+        tests:
+          - not_null
+          - unique
+
+      - name: loan_amount
+        description: "The total deployed principal amount of the loan."
+        tests:
+          - not_null
+
+      - name: interest_rate
+        description: "Raw interest rate stored as a decimal (e.g., 0.16 represents 16%)."
+        tests:
+          - not_null
+
+      - name: loan_risk_score
+        description: "Calculated numeric loan risk score pulled from intermediate risk metrics."
+        tests:
+          - not_null
+
+      - name: loan_risk_segment
+        description: "Loan risk category mapped out of the static risk score thresholds."
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['high_risk', 'medium_risk', 'low_risk']
+
+      - name: loan_size_segment
+        description: "Loan size classification based on raw principal bounds."
+        tests:
+          - not_null
+          - accepted_values:
+              values:
+                - small_loan
+                - medium_loan
+                - large_loan
+
+      - name: high_interest_flag
+        description: "Boolean indicator. True if the interest rate multiplied by 100 scales past 20%."
+        tests:
+          - not_null
+
+      - name: high_default_probability
+        description: "Boolean indicator. True if the loan falls strictly into the high_risk segment tier."
+        tests:
+          - not_null

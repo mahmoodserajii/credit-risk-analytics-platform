@@ -1,0 +1,49 @@
+version: 2
+
+models:
+  - name: stg_loans
+    description: "Cleaned and deduplicated loan contracts with data quality flags."
+    columns:
+      - name: loan_id
+        description: "Primary key for the loan."
+        tests:
+          - unique
+          - not_null
+
+      - name: account_id
+        description: "Foreign key to the account taking the loan."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_accounts')
+              field: account_id
+
+      - name: loan_status_id
+        tests:
+          - relationships:
+              to: ref('stg_loan_statuses')
+              field: loan_status_id
+
+      - name: loan_amount
+        description: "The original principal amount of the loan."
+        tests:
+          - not_null
+
+      - name: interest_rate
+        description: "The annual interest rate (e.g., 5.5)."
+
+      - name: start_date
+        description: "Date the loan was issued. Cleaned via clean_date macro."
+
+      - name: estimated_end_date
+        description: "Expected maturity date. Cleaned via clean_date macro."
+
+      # Data Quality Flags
+      - name: is_invalid_loan_amount
+        description: "True if principal amount is 0 or negative."
+
+      - name: is_invalid_interest_rate
+        description: "True if interest rate is outside 0-100% range."
+
+      - name: is_invalid_date_range
+        description: "True if the end date is before the start date."

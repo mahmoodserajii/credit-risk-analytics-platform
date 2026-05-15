@@ -1,0 +1,62 @@
+version: 2
+
+models:
+  - name: int_account_activity
+    description: "Account-level financial activity including inflows, outflows, and net transaction flow."
+    columns:
+
+      - name: account_id
+        description: "Unique identifier for bank account"
+        tests:
+          - not_null
+          - unique
+
+      - name: customer_id
+        description: "Owner of the account"
+        tests:
+          - not_null
+
+      - name: balance
+        description: "Current account balance"
+
+      - name: total_outgoing_transactions
+        description: "Number of outgoing transactions from account"
+
+      - name: total_incoming_transactions
+        description: "Number of incoming transactions to account"
+
+      - name: total_amount_sent
+        description: "Total money sent from account"
+
+      - name: total_amount_received
+        description: "Total money received into account"
+
+      - name: net_transaction_flow
+        description: "Net inflow/outflow balance (received - sent)"
+
+  - name: int_account_risk_profile
+    description: "Risk scoring model for accounts based on financial behavior and anomalies."
+    columns:
+
+      - name: account_id
+        tests:
+          - not_null
+          - unique
+
+      - name: risk_score
+        description: "Computed risk score for account"
+
+      - name: risk_segment
+        description: "Categorical risk classification"
+        tests:
+          - accepted_values:
+              values: ['low_risk', 'medium_risk', 'high_risk']
+
+      - name: has_negative_balance
+        description: "Flag for overdraft or negative balance condition"
+
+      - name: has_extreme_cash_flow
+        description: "Flag for abnormal financial movement"
+
+      - name: is_high_volume_account
+        description: "Flag for high transaction activity accounts"

@@ -1,0 +1,77 @@
+version: 2
+
+models:
+  - name: mart_customer_360
+    description: >
+      Consolidated master customer analytical ledger (Customer 360). 
+      Integrates standard identity records with calculated values, 
+      behavioral cadences, fraud summaries, and risk matrices into a single 1:1 row per customer grain.
+    columns:
+      - name: customer_id
+        description: "Primary key. Unique analytical customer identifier."
+        tests:
+          - not_null
+          - unique
+
+      - name: customer_value_segment
+        description: "Historical value tier assignment pulled from core demographic value baselines."
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['standard_customer', 'mid_value_customer', 'high_value_customer']
+
+      - name: customer_risk_segment
+        description: "Central credit and system exposure classification bracket derived from system risk flags."
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['low_risk', 'medium_risk', 'high_risk']
+
+      - name: customer_behavior_segment
+        description: "Value flow behavior segment evaluating total gross cash inflows relative to net stability parameters."
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['premium_stable', 'high_value', 'financially_risky', 'standard']
+
+      - name: priority_segment
+        description: >
+          Fully comprehensive cross-functional operational matrix sorting clients based on overlapping 
+          value and credit risk traits. Powers targeted automated flows for collections, retention, and VIP growth.
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - high_value_high_risk
+                  - mid_value_high_risk
+                  - low_value_high_risk
+                  - premium_growth
+                  - high_value_monitored
+                  - mid_market_stable
+                  - early_warning_risk
+                  - standard_mid_tier
+                  - standard_retail
+
+      - name: has_negative_balance_flag
+        description: "Boolean indicator. True if the aggregate average ledger footprint across all sub-accounts falls below 0."
+        tests:
+          - not_null
+
+      - name: total_customer_balance
+        description: "Summed net currency reserves maintained within the bank ecosystem by this customer."
+        tests:
+          - not_null
+
+      - name: composite_customer_risk_score
+        description: "Unified weighted structural score grading baseline vulnerability on a deterministic 0 to 100 range."
+        tests:
+          - not_null
+
+      - name: stable_cashflow
+        description: "Boolean indicator proving that month-over-month cash flow variation tracks below the 50% relative boundary."
+        tests:
+          - not_null

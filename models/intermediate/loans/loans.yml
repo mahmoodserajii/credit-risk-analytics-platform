@@ -1,0 +1,89 @@
+version: 2
+
+models:
+  - name: int_loan_repayment_risk
+    description: "Loan-level risk indicators, exposure flags, and calculated repayment risk tiers."
+    columns:
+      - name: loan_id
+        description: "Primary key for the loan transaction."
+        tests:
+          - not_null
+          - unique
+
+      - name: loan_amount
+        description: "The original principal amount deployed for the loan."
+        tests:
+          - not_null
+
+      - name: interest_rate
+        description: "Raw interest rate stored as a decimal (e.g., 0.16 represents 16%)."
+        tests:
+          - not_null
+
+      - name: loan_duration_days
+        description: "The total length of the loan contract calculated as estimated_end_date minus start_date."
+        tests:
+          - not_null
+
+      - name: is_high_interest_loan
+        description: "Boolean flag. True if the interest rate multiplied by 100 exceeds 15%."
+        tests:
+          - not_null
+
+      - name: is_large_exposure_loan
+        description: "Boolean flag. True if the principal loan amount exceeds $100,000."
+        tests:
+          - not_null
+
+      - name: loan_risk_score
+        description: "Computed numerical risk score generated from the evaluation macro."
+        tests:
+          - not_null
+
+      - name: loan_risk_segment
+        description: "Categorical risk bucket mapped from the single calculated loan risk score."
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['high_risk', 'medium_risk', 'low_risk']
+
+  - name: int_monthly_loan_portfolio_trends
+    description: "Monthly aggregation of loan originations, tracking macro portfolio interest rates and risk concentrations."
+    columns:
+      - name: loan_month
+        description: "The calendar month of loan origination (Truncated to YYYY-MM-01)."
+        tests:
+          - not_null
+          - unique
+
+      - name: total_loans
+        description: "Total number of clean, trusted loans issued during the month."
+        tests:
+          - not_null
+
+      - name: total_loan_volume
+        description: "The total principal capital deployed in the given month."
+        tests:
+          - not_null
+
+      - name: avg_interest_rate
+        description: "The mean interest rate for the month, scaled out of 100 (e.g., 12.5 represents 12.5%)."
+        tests:
+          - not_null
+
+      - name: high_interest_loans
+        description: "The raw count of individual loans issued with an interest rate exceeding 15%."
+        tests:
+          - not_null
+
+      - name: high_interest_loan_ratio
+        description: "Percentage of the month's total loans that qualify as high-interest (0.00 to 100.00)."
+        tests:
+          - not_null
+
+      - name: portfolio_risk_segment
+        description: "Macro risk category based on whether the monthly average interest rate is above 15% (High), 8% (Medium), or lower."
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['high_risk_period', 'medium_risk_period', 'low_risk_period']

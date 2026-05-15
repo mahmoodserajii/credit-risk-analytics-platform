@@ -1,0 +1,92 @@
+version: 2
+
+models:
+  - name: mart_fraud_risk_monitoring
+    description: >
+      Transaction-level risk ledger designed for fraud operations and compliance monitoring teams.
+      Enriches clean, scored transactions with origin account metadata, branch locations, and payment type dimensions.
+    columns:
+      - name: transaction_id
+        description: "Primary key. Unique transaction identifier."
+        tests:
+          - not_null
+          - unique
+
+      - name: account_origin_id
+        description: "Foreign key linking to the originating bank account."
+        tests:
+          - not_null
+
+      - name: account_destination_id
+        description: "Foreign key linking to the target bank account or merchant destination."
+        tests:
+          - not_null
+
+      - name: origin_customer_id
+        description: "The unique customer identifier owning the originating account."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_customers')
+              field: customer_id
+
+      - name: transaction_date
+        description: "Standardized transaction timestamp, parsed via macro to handle timestamp and string anomalies."
+        tests:
+          - not_null
+
+      - name: amount
+        description: "The monetary value processed."
+        tests:
+          - not_null
+
+      - name: branch_id
+        description: "Foreign key mapping the transaction to its point-of-origin physical bank branch."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_branches')
+              field: branch_id
+
+      - name: transaction_type
+        description: "Human-readable classification of the payment (e.g., Transfer, ATM Withdrawal, Wire)."
+        tests:
+          - not_null
+
+      - name: fraud_score
+        description: "Base validation fraud risk score calculated via internal dbt system macros."
+        tests:
+          - not_null
+
+      - name: composite_fraud_risk_score
+        description: "Weighted mathematical score (0 to 100) combining all underlying anomaly indicators."
+        tests:
+          - not_null
+
+      - name: fraud_risk_segment
+        description: "Categorical tier used for operations routing and automated alerting thresholds."
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['low_fraud_risk', 'medium_fraud_risk', 'high_fraud_risk']
+
+      - name: is_abnormally_large_transaction
+        description: "Boolean indicator. True if the amount exceeds 3 standard deviations of the account's historical average."
+        tests:
+          - not_null
+
+      - name: high_velocity_flag
+        description: "Boolean indicator. True if the account exceeded 20 transactions within a rolling 60-minute frame."
+        tests:
+          - not_null
+
+      - name: high_frequency_connection
+        description: "Boolean indicator. True if link density between the origin and destination exceeds standard baselines."
+        tests:
+          - not_null
+
+      - name: is_outlier
+        description: "Boolean indicator. True if the value breaches the localized 99th percentile historical ceiling."
+        tests:
+          - not_null

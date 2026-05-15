@@ -1,0 +1,137 @@
+version: 2
+
+models:
+  - name: int_customer_profile
+    columns:
+      - name: customer_id
+        tests:
+          - not_null
+          - unique
+          - relationships:
+              to: ref('stg_customers')
+              field: customer_id
+
+      - name: customer_value_segment
+        tests:
+          - accepted_values:
+              values: ['standard_customer', 'mid_value_customer', 'high_value_customer']
+
+  - name: int_customer_transaction_summary
+    description: >
+      Customer-level financial transaction summary. Aggregates account activity 
+      and behavioral metrics to provide a single view of a customer's banking profile.
+    columns:
+      - name: customer_id
+        description: "Primary key. Unique identifier for the customer."
+        tests:
+          - not_null
+          - unique
+          - relationships:
+              to: ref('stg_customers')
+              field: customer_id
+
+      - name: total_accounts
+        description: "The total number of active and inactive accounts owned by the customer."
+        tests:
+          - not_null
+
+      - name: total_outgoing_transactions
+        description: "Cumulative count of all sent money transfers."
+        tests:
+          - not_null
+
+      - name: total_incoming_transactions
+        description: "Cumulative count of all received money transfers."
+        tests:
+          - not_null
+
+      - name: total_amount_sent
+        description: "Total volume of capital moved out of the customer's accounts."
+        tests:
+          - not_null
+
+      - name: total_amount_received
+        description: "Total volume of capital moved into the customer's accounts."
+        tests:
+          - not_null
+
+      - name: net_transaction_flow
+        description: "The difference between total amount received and total amount sent."
+        tests:
+          - not_null
+
+      - name: avg_transaction_amount
+        description: "The true mean size of transactions across all owned accounts, avoiding averages-of-averages."
+        tests:
+          - not_null
+
+      - name: has_high_volume_activity
+        description: "Boolean flag. True if any underlying transaction exceeded high-volume risk limits."
+        tests:
+          - not_null
+
+  - name: int_customer_fraud_profile
+    columns:
+      - name: customer_id
+        tests:
+          - not_null
+          - unique
+      
+      - name: total_flagged_transactions
+        description: "Total suspicious or flagged transactions linked to the customer"
+
+      - name: high_risk_transaction_ratio
+        description: "Percentage of high-risk transactions for the customer"
+      
+
+  - name: int_customer_segmentation
+    description: >
+      Customer behavioral and financial segmentation model. Classifies clients 
+      based on gross cash inflows, net growth, and cashflow stability.
+    columns:
+      - name: customer_id
+        tests:
+          - not_null
+          - unique
+
+      - name: customer_segment
+        description: >
+          The assigned behavioral tier. Premium and High Value segments are strictly 
+          gated to ensure they have positive net growth.
+        tests:
+          - not_null
+          - accepted_values:
+              values:
+                - premium_stable
+                - high_value
+                - financially_risky
+                - standard
+
+      - name: total_amount_received
+        description: "Gross financial inflow. Used as the primary measure of account scale."
+        tests:
+          - not_null
+
+      - name: net_transaction_flow
+        description: "Net cash position change (Inflow minus Outflow). Must be above 0 for top-tier placement."
+        tests:
+          - not_null
+  - name: int_customer_loan_summary
+    description: "Aggregation of loan performance and risk segments by status."
+    columns:
+      - name: loan_status_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_loan_statuses')
+              field: loan_status_id
+
+      - name: portfolio_risk_segment
+        description: "Risk category based on average interest rate (Multiplied by 100)."
+        tests:
+          - accepted_values:
+              values: ['high_interest_portfolio', 'medium_interest_portfolio', 'low_interest_portfolio']
+
+      - name: avg_interest_rate
+        description: "Mean interest rate for the specific loan status group."
+

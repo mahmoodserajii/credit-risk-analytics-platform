@@ -1,0 +1,34 @@
+version: 2
+
+models:
+  - name: stg_accounts
+    description: "Bank account level data"
+
+    columns:
+      - name: account_id
+        tests:
+          - unique
+          - not_null
+
+      - name: customer_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_customers')
+              field: customer_id
+
+      - name: account_type_id
+        tests:
+          - relationships:
+              to: ref('stg_account_types')
+              field: account_type_id
+
+      - name: account_status_id
+        tests:
+          - relationships:
+              to: ref('stg_account_statuses')
+              field: account_status_id
+
+      - name: balance
+        tests:
+          - not_null

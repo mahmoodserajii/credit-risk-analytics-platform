@@ -1,0 +1,84 @@
+version: 2
+
+models:
+  - name: fct_fraud_features
+    description: >
+      Centralized transaction-level fraud detection feature store. Consolidates statistical 
+      outliers, network connection frequencies, rolling velocity bursts, and composite risk segments 
+      using a 1:1 transaction ledger grain.
+    columns:
+      - name: transaction_id
+        description: "Primary key. Unique transaction identifier used to anchor feature alignments."
+        tests:
+          - not_null
+          - unique
+
+      - name: account_origin_id
+        description: "Foreign key referencing the source account initiating the funds transfer."
+        tests:
+          - not_null
+
+      - name: account_destination_id
+        description: "Foreign key referencing the target account or merchant receiving the funds."
+        tests:
+          - not_null
+
+      - name: amount
+        description: "The raw monetary size of the evaluated transaction."
+        tests:
+          - not_null
+
+      - name: fraud_score
+        description: "Base validation fraud risk score calculated via internal system macros."
+        tests:
+          - not_null
+
+      - name: is_abnormally_large_transaction
+        description: "Boolean indicator. True if the amount is greater than 3 standard deviations above the origin account's historical mean."
+        tests:
+          - not_null
+
+      - name: txn_count_last_hour
+        description: "The total transaction frequency count for this account across a rolling 60-minute window (corrected from txn_count_per_hour)."
+        tests:
+          - not_null
+
+      - name: high_velocity_flag
+        description: "Boolean indicator. True if the origin account triggers more than 20 operations within a rolling 60-minute frame."
+        tests:
+          - not_null
+
+      - name: transaction_count
+        description: "The total historical volume of transactions executed specifically between this origin and destination pair."
+        tests:
+          - not_null
+
+      - name: total_flow
+        description: "The cumulative monetary value transferred over time between this specific directional account connection."
+        tests:
+          - not_null
+
+      - name: high_frequency_connection
+        description: "Boolean indicator. True if the connection link density exceeds historical peer thresholds."
+        tests:
+          - not_null
+
+      - name: is_outlier
+        description: "Boolean indicator. True if the individual transaction amount exceeds the account's localized 99th percentile ceiling."
+        tests:
+          - not_null
+
+      - name: composite_fraud_risk_score
+        description: "Weighted mathematical composite risk score (0 to 100) generated from the structural boolean indicators matrix."
+        tests:
+          - not_null
+
+      - name: fraud_risk_segment
+        description: "Final categorical fraud classification tier mapped directly from the composite score ranges."
+        tests:
+          - not_null
+          - accepted_values:
+              values:
+                - low_fraud_risk
+                - medium_fraud_risk
+                - high_fraud_risk
