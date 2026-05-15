@@ -1,21 +1,18 @@
+# Python virtual environment
+credit/
+
 # dbt artifacts
 target/
 dbt_packages/
 logs/
 
-# Python virtual environment
-credit/
-
 # Python cache
 __pycache__/
 *.pyc
 
-# Environment files
-.env
-
-# VS Code
-.vscode/
-
 # OS files
 .DS_Store
 Thumbs.db
+
+# VSCode
+.vscode/
